@@ -1,16 +1,17 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@radix-ui/react-label";
+
 import React, { useState } from "react";
 
-import { db } from "../../../firebase.config"; //Firestoreのインスタンス
+import { db } from "../../firebase.config"; //Firestoreのインスタンス
 import { collection, addDoc } from "firebase/firestore"; //SDKからFirestore関連メソッドをインポート
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
-export default function Home() {
+export const CreatePost = () => {
   // フォームの内容を格納するステートを用意
-  const [name, setName] = useState(""); // 投稿者名
+  const [title, setTitle] = useState(""); // 投稿者名
   const [content, setContent] = useState(""); // 投稿内容
 
   ///////////////////////////////
@@ -22,13 +23,14 @@ export default function Home() {
     try {
       // データベースに保存するデータを準備
       const data = {
-        name: name, // フォームから取得したnameをdataに
+        createdAt: new Date().toISOString(), // 作成日時
+        title: title, // フォームから取得したnameをdataに
         content: content, // フォームから取得したcontentをdataに
       };
       // "posts" という名前のコレクションにアクセスし、新しいドキュメントを追加
       const docRef = await addDoc(collection(db, "posts"), data);
       // フォームを空にする
-      setName("");
+      setTitle("");
       setContent("");
       // 成功した場合：追加されたドキュメントのIDと送信データをコンソールに返す
       console.log({ id: docRef.id, ...data });
@@ -48,16 +50,16 @@ export default function Home() {
       <form onSubmit={handleSave}>
         <div className="space-y-6">
           <Label className="block">
-            お名前
+            タイトル
             <Input
-              placeholder="お名前"
-              value={name}
-              onChange={(e) => setName(e.target.value)} // 入力内容を更新
+              placeholder="タイトル"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)} // 入力内容を更新
               type="text"
             />
           </Label>
           <Label className="block">
-            Tweet
+            本文
             <Textarea
               placeholder="つぶやきましょう！"
               value={content}
@@ -73,4 +75,4 @@ export default function Home() {
       </form>
     </div>
   );
-}
+};
